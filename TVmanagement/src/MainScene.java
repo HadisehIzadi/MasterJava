@@ -6,7 +6,9 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class MainScene extends JFrame {
@@ -30,6 +32,7 @@ public class MainScene extends JFrame {
     JTextField numberTVFLD;
     JLabel numberTvLBL;
     JLabel todayDate;
+    SimpleDateFormat df;
 
     //****************** packages details elements ****************
     JCheckBox sportbx;
@@ -56,6 +59,10 @@ public class MainScene extends JFrame {
     JButton loadButton;
     JButton newButton;
     JPanel actionPanel;
+
+    //**************** objects ************************************
+    Subscriber subscriber;
+    Subscription subscription;
 
 
 
@@ -104,7 +111,7 @@ public class MainScene extends JFrame {
         cyclePanel.setBorder(panel2Tile);
 
         todayDate = new JLabel();
-        SimpleDateFormat df;
+        
         Date currentDate ;
         df = new SimpleDateFormat("dd/MM/yyyy");
         currentDate = new Date();
@@ -317,15 +324,100 @@ public class MainScene extends JFrame {
     }
 
     public  void DisplaySportChannels()
-{
+    {
+        SportChannel s1 = new SportChannel("AFN Sports", "EN", "SPRT",5);
+        SportChannel s2 = new SportChannel("beIN Sports", "FR", "SPRT",3);
+        SportChannel s3 = new SportChannel("Eleven Sports", "EN", "SPRT",8);
+        SportChannel s4 = new SportChannel("NBA TV", "EN", "SPRT",6);
+        SportChannel s5 = new SportChannel("NFL Network", "AR", "SPRT",3);
+        SportChannel s6 = new SportChannel("The Ski Channel", "USA", "SPRT",1);
 
-}
+
+        ArrayList<SportChannel> sportList = new ArrayList<>();
+        sportList.add(s1);
+        sportList.add(s2);
+        sportList.add(s3);
+        sportList.add(s4);
+        sportList.add(s5);
+        sportList.add(s6);
+
+        String sprtChannelString = "";
+        for (int i= 0; i < sportList.size() ; i++){
+            sprtChannelString +=
+                    "     "+ sportList.get(i).getChannelName()
+                            + "     "+ sportList.get(i).getLanguage()
+                            + "     " + sportList.get(i).getPrice()
+                            + "\n";
+
+        }
+        channelsAreaSport.setText(sprtChannelString);
+
+
+
+
+    }
     public  void DisplayMovieChannels()
     {
+
+        MovieChannel m1 = new MovieChannel("MBC Bundle", "EN", "MOV", 4);
+        MovieChannel m2 = new MovieChannel("Cinema One", "EN", "MOV",5);
+        MovieChannel m3 = new MovieChannel("Cinema Pro", "RU", "MOV",6);
+        MovieChannel m4 = new MovieChannel("Cinema 1", "AR", "MOV",2);
+        MovieChannel m5 = new MovieChannel("Movie Home", "GR", "MOV",4);
+        MovieChannel m6 = new MovieChannel("Film4", "FR", "MOV",2);
+
+        ArrayList<MovieChannel> movieList = new ArrayList<>();
+        movieList.add(m1);
+        movieList.add(m2);
+        movieList.add(m3);
+        movieList.add(m4);
+        movieList.add(m5);
+        movieList.add(m6);
+
+        String movChannelString = "";
+        int packagePrice =0;
+
+        for (int i= 0; i < movieList.size() ; i++){
+            movChannelString +=
+                    "     "+ movieList.get(i).getChannelName()
+                            + "     "+ movieList.get(i).getLanguage()
+                            + "     " + movieList.get(i).getPrice()
+                            + "\n";
+
+        }
+        channelsAreaMovie.setText(movChannelString);
+
 
     }
     public  void DisplayDocumentChannels()
     {
+        DocumentaryChannel d1 = new DocumentaryChannel("NAT GEO", "SP", "DOC", 3);
+        DocumentaryChannel d2 = new DocumentaryChannel("PBS America", "EN", "DOC", 2);
+        DocumentaryChannel d3 = new DocumentaryChannel("Al Jazeera Documentary", "IN", "DOC",3);
+        DocumentaryChannel d4 = new DocumentaryChannel("Canal D", "USA", "EN", 4);
+        DocumentaryChannel d5 = new DocumentaryChannel("Discovery Historia", "AR", "DOC", 5);
+        DocumentaryChannel d6 = new DocumentaryChannel("World Documentary", "GR", "DOC", 1);
+
+
+        ArrayList<DocumentaryChannel> documentaryChannels = new ArrayList<>();
+        documentaryChannels.add(d1);
+        documentaryChannels.add(d2);
+        documentaryChannels.add(d3);
+        documentaryChannels.add(d4);
+        documentaryChannels.add(d5);
+        documentaryChannels.add(d6);
+
+        String docString = "";
+        for(int i = 0 ;  i < documentaryChannels.size() ; i++)
+        {
+            docString +=
+                    "     "+ documentaryChannels.get(i).getChannelName()
+                            + "     "+ documentaryChannels.get(i).getLanguage()
+                            + "     " + documentaryChannels.get(i).getPrice()
+                            + "\n";
+        }
+
+        channelsAreaDocumnet.setText(docString);
 
     }
 
@@ -347,7 +439,43 @@ public class MainScene extends JFrame {
 
     }
 
+    private void GetSubsciberData() throws ParseException {
+        Date currentDate = new Date();
 
+        //Subscriber Data:
+        subscriber = new Subscriber(
+                subNameField.getText(),
+                subLastNameField.getText(),
+                subCityField.getText(),
+                Integer.parseInt(subMobileField.getText()));
+
+        // Cycle
+        Date startCycle = df.parse(startCycleFLD.getText());
+        Date endCycle   = df.parse(endCycleFLD.getText());
+
+        SubscriptionCycle cycle = new SubscriptionCycle(
+                df.format(startCycle),
+                df.format(endCycle)
+        );
+
+        // Subscription
+        subscription = new Subscription(
+                Integer.parseInt(numberTVFLD.getText()),
+                subscriber,
+                cycle,
+                df.format(currentDate)
+        );
+
+        installFeeLBl.setText("Installation Fee: "+
+                subscription.getTotalFee() + " $");
+
+        ShowPrice();
+
+
+    }
+
+    private void ShowPrice() {
+    }
 
 
     public static void main(String[] args) {
