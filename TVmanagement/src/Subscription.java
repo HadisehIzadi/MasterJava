@@ -1,4 +1,6 @@
-public class Subscription {
+import java.io.Serializable;
+
+public class Subscription implements Serializable {
     private int installFee;     // fixed fee:   10$/ TV
     private int nbTV;
     private Subscriber subscriber;

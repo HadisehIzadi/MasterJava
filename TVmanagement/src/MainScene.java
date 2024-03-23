@@ -6,12 +6,14 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
 public class MainScene extends JFrame {
+
     //****************** subscriber details elements ****************
     JPanel subscriberPanel;
     JTextField subNameField;
@@ -63,6 +65,11 @@ public class MainScene extends JFrame {
     //**************** objects ************************************
     Subscriber subscriber;
     Subscription subscription;
+    int packagesSelectedPrice = 0;
+    int totalPrice;
+
+    ArrayList<Subscription> listToSave = new ArrayList<>();
+    File file;
 
 
 
@@ -170,6 +177,10 @@ public class MainScene extends JFrame {
                 {
                     DisplaySportChannels();
                 }
+                else{
+                    channelsAreaSport.setText("");
+
+                }
             }
         });
 
@@ -178,6 +189,10 @@ public class MainScene extends JFrame {
             public void stateChanged(ChangeEvent e) {
                 if(moviebx.isSelected())
                     DisplayMovieChannels();
+                else{
+                    channelsAreaMovie.setText("");
+
+                }
             }
         });
 
@@ -186,12 +201,21 @@ public class MainScene extends JFrame {
             public void stateChanged(ChangeEvent e) {
                 if(docbx.isSelected())
                     DisplayDocumentChannels();
+                else{
+                    channelsAreaDocumnet.setText("");
+
+                }
             }
         });
         subscribe.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SubScribeChannelPackages();
+                try{
+                    GetSubsciberData();
+                }catch (Exception ee){
+
+                }
+               // SubScribeChannelPackages();
             }
         });
 
@@ -294,7 +318,7 @@ public class MainScene extends JFrame {
         loadButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                loadDataFromDisk();
+                ArrayList<Subscription> k = LoadDataFromDisk();
             }
         });
         newButton.addActionListener(new ActionListener() {
@@ -323,7 +347,7 @@ public class MainScene extends JFrame {
 
     }
 
-    public  void DisplaySportChannels()
+    public int DisplaySportChannels()
     {
         SportChannel s1 = new SportChannel("AFN Sports", "EN", "SPRT",5);
         SportChannel s2 = new SportChannel("beIN Sports", "FR", "SPRT",3);
@@ -342,21 +366,25 @@ public class MainScene extends JFrame {
         sportList.add(s6);
 
         String sprtChannelString = "";
+        int packagePrice =0;
         for (int i= 0; i < sportList.size() ; i++){
             sprtChannelString +=
                     "     "+ sportList.get(i).getChannelName()
                             + "     "+ sportList.get(i).getLanguage()
                             + "     " + sportList.get(i).getPrice()
                             + "\n";
+            packagePrice += sportList.get(i).getPrice();
 
         }
         channelsAreaSport.setText(sprtChannelString);
+
+        return packagePrice;
 
 
 
 
     }
-    public  void DisplayMovieChannels()
+    public int DisplayMovieChannels()
     {
 
         MovieChannel m1 = new MovieChannel("MBC Bundle", "EN", "MOV", 4);
@@ -383,13 +411,15 @@ public class MainScene extends JFrame {
                             + "     "+ movieList.get(i).getLanguage()
                             + "     " + movieList.get(i).getPrice()
                             + "\n";
+            packagePrice += movieList.get(i).getPrice();
 
         }
         channelsAreaMovie.setText(movChannelString);
+        return  packagePrice;
 
 
     }
-    public  void DisplayDocumentChannels()
+    public int DisplayDocumentChannels()
     {
         DocumentaryChannel d1 = new DocumentaryChannel("NAT GEO", "SP", "DOC", 3);
         DocumentaryChannel d2 = new DocumentaryChannel("PBS America", "EN", "DOC", 2);
@@ -408,6 +438,7 @@ public class MainScene extends JFrame {
         documentaryChannels.add(d6);
 
         String docString = "";
+        int packagePrice = 0;
         for(int i = 0 ;  i < documentaryChannels.size() ; i++)
         {
             docString +=
@@ -415,9 +446,11 @@ public class MainScene extends JFrame {
                             + "     "+ documentaryChannels.get(i).getLanguage()
                             + "     " + documentaryChannels.get(i).getPrice()
                             + "\n";
+            packagePrice += documentaryChannels.get(i).getPrice();
         }
 
         channelsAreaDocumnet.setText(docString);
+        return  packagePrice;
 
     }
 
@@ -429,13 +462,89 @@ public class MainScene extends JFrame {
     public  void SaveDataToDisk()
     {
 
+        listToSave.add(subscription);
+
+        file = new File("d:\\myfile.dat");
+
+        try{
+            OutputStream os = new FileOutputStream(file);
+            ObjectOutputStream oos  = new ObjectOutputStream(os);
+
+            // saving the list of subscriptions
+            oos.writeObject(listToSave);
+            oos.flush();
+            oos.close();
+            os.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
-    public  void loadDataFromDisk()
-    {
+    private ArrayList<Subscription> LoadDataFromDisk() {
+        ArrayList<Subscription> s = new ArrayList<>();
+        file = new File("d:\\myfile.dat");
+
+
+        try{
+            InputStream is = new FileInputStream(file);
+            ObjectInputStream ois = new ObjectInputStream(is);
+
+            s = (ArrayList) ois.readObject();
+            ois.close();
+            is.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+
+        for (Subscription sub: s){
+            DisplaySubscriptionsInTable(sub);
+        }
+
+        return s;
+    }
+
+    private void DisplaySubscriptionsInTable(Subscription sub) {
+
+        // Displaying Data from disk into table
+        tableModel.addRow(new Object[]{
+                sub.getSubscriber().getfName(),
+                sub.getSubscriber().getlName(),
+                sub.getSubscriber().getPhone(),
+                sub.getCycle().getStartDate(),
+                sub.getCycle().getEndDate(),
+                sub.getTotalFee()
+        });
+
 
     }
     public void newData()
     {
+        subNameField.setText("");
+        subLastNameField.setText("");
+        subCityField.setText("");
+        subMobileField.setText("");
+
+        startCycleFLD.setText("");
+        endCycleFLD.setText("");
+        numberTVFLD.setText("");
+
+
+        installFeeLBl.setText("Installation Fee: ");
+        packageFeeLBL.setText("Packages Fee: ");
+        totalFeeLBL.setText("Total Amount to Pay: ");
+
+        moviebx.setSelected(false);
+        docbx.setSelected(false);
+        sportbx.setSelected(false);
 
     }
 
@@ -475,6 +584,19 @@ public class MainScene extends JFrame {
     }
 
     private void ShowPrice() {
+        if (docbx.isSelected())
+            packagesSelectedPrice += DisplayDocumentChannels();
+
+        else if(moviebx.isSelected()){
+            packagesSelectedPrice += DisplayMovieChannels();
+        }else if (sportbx.isSelected()){
+            packagesSelectedPrice += DisplaySportChannels();
+        }
+
+        packageFeeLBL.setText("Packages Fee: " + packagesSelectedPrice + " $");
+        totalPrice  = subscription.getTotalFee() + packagesSelectedPrice;
+
+        totalFeeLBL.setText("Total Amount to Pay: "+ totalPrice+ " $");
     }
 
 
