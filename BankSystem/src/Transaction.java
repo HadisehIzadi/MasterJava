@@ -26,6 +26,7 @@ public class Transaction implements Comparable<Transaction>, Serializable {
         return this.trsNo - o.trsNo;
     }
 
+
     @Override
     public String toString() {
         return "Transaction{" +
@@ -36,7 +37,6 @@ public class Transaction implements Comparable<Transaction>, Serializable {
                 ", amount=" + amount +
                 '}';
     }
-
 
     public int getTrsNo() {
         return trsNo;

@@ -486,6 +486,7 @@ public class MainScene extends JFrame {
     private ArrayList<Subscription> LoadDataFromDisk() {
         ArrayList<Subscription> s = new ArrayList<>();
         file = new File("d:\\myfile.dat");
+
         Private ArrayList<Subscription> LoadDataFromDisk()
         {
             file = new File("d\\myfile .dat");

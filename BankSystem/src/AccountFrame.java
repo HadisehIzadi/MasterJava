@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class AccountFrame extends JFrame {
+public class  AccountFrame extends JFrame {
     JLabel accnNoLBL, ownerLBL, balanceLBL, cityLBL, genderLBL, amountLBL;
     JTextField accNoTXT, ownerTXT, balanceTXT, amountTXT;
     JComboBox<City> citiesCMB;
@@ -39,6 +39,7 @@ public class AccountFrame extends JFrame {
 
 
     public AccountFrame() {
+        // the panel title
         super("Account Operations");
         setLayout(null);
         setSize(600,400);
@@ -146,7 +147,7 @@ public class AccountFrame extends JFrame {
         add(p4);
         add(p5);
 
-        // tabel creation
+        // table creation
         tableModel = new DefaultTableModel();
 
         table = new JTable(tableModel);
