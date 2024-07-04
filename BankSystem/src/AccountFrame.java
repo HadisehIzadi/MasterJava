@@ -274,7 +274,7 @@ public class  AccountFrame extends JFrame {
                 acc = x = accountsLST.getSelectedValue();
 
                 accNoTXT.setText(String.valueOf(acc.accNo));
-                ownerTXT.setText(acc.owner);
+                ownerTXT.setText(acc.owner);ط
                 citiesCMB.setSelectedItem(acc.city);
 
                 if (acc.gender == 'M') maleRDB.setSelected(true);
