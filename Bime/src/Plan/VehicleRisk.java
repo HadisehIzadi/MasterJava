@@ -1,8 +1,10 @@
-public class DriverDamage extends Risk{
+package Plan;
+
+public class VehicleRisk extends Risk{
 
     @Override
     public float getCoverage() {
-       return  0.05f;
+        return 0.9f;
     }
 
     @Override
@@ -12,9 +14,8 @@ public class DriverDamage extends Risk{
 
     @Override
     public float getPrimuim() {
-        return 6f;
+        return 0.05f;
     }
 
-
-    public String[] DriverRiskCoverd = {"Driver Damage "};
+    public String[] vehicleRiskCoverd = {"Vehicle Plan.Risk"};
 }

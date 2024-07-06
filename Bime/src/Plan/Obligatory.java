@@ -1,3 +1,5 @@
+package Plan;
+
 public class Obligatory extends Risk{
 
 

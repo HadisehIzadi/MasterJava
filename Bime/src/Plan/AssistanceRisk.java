@@ -1,3 +1,5 @@
+package Plan;
+
 public class AssistanceRisk extends Risk{
 
 

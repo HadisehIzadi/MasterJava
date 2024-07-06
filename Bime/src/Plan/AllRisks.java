@@ -1,3 +1,5 @@
+package Plan;
+
 public class AllRisks extends Risk{
 
     @Override
