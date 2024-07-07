@@ -17,5 +17,11 @@ public class AllRisks extends Risk{
         return 10f;
     }
 
-    public String[] ObligatoryRiskCoverd = {"Third party Damage" , "Fire" , "Driver Damage"};
+    public String[] ObligatoryRiskCoverd = {"Fire",
+            "Robbery",
+            "Third Party Damage",
+            "Vehicle Damage",
+            "Driver Damage",
+            "Transport",
+            "Car Replacement"};
 }
