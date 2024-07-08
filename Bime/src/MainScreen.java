@@ -652,6 +652,78 @@ JTextField subPhone = new JTextField();
     };
 
     private void GetRisksCoveredByPlan() {
+
+            AllRisks allRisk = new AllRisks();
+            Obligatory obligatoryRisk = new Obligatory();
+            allRiskCHKBX.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    dDamageCHKBX.setEnabled(false);
+                    vDamageCHKBX.setEnabled(false);
+                    assisCHKBX.setEnabled(false);
+                    obligatoryCHKBX.setEnabled(false);
+
+
+                    for (int i = 0; i< allRisk.AllRiskCoverd.length;i++){
+                        coveredRisksList.add(allRisk.AllRiskCoverd[i]);
+                    }
+                    premiumRisksList.add(allRisk.getPrimuim());
+                    coverageRisksList.add(allRisk.getCoverage());
+                    ceilingRiskList.add(allRisk.getCeilling());
+                }
+            });
+
+            obligatoryCHKBX.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    coveredRisksList.add(obligatoryRisk.ObligatoryRiskCoverd[0]);
+                    premiumRisksList.add(obligatoryRisk.getPrimuim());
+                    coverageRisksList.add(obligatoryRisk.getCoverage());
+                    ceilingRiskList.add(obligatoryRisk.getCeilling());
+
+                }
+            });
+
+            vDamageCHKBX.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    VehicleRisk vehicleRisk = new VehicleRisk();
+
+                    coveredRisksList.add(vehicleRisk.vehicleRiskCoverd[0]);
+                    premiumRisksList.add(vehicleRisk.getPrimuim());
+                    coverageRisksList.add(vehicleRisk.getCoverage());
+                    ceilingRiskList.add(vehicleRisk.getCeilling());
+
+                }
+            });
+
+            dDamageCHKBX.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    DriverDamage driverRisk = new DriverDamage();
+                    coveredRisksList.add(driverRisk.DriverRiskCoverd[0]);
+                    premiumRisksList.add(driverRisk.getPrimuim());
+                    coverageRisksList.add(driverRisk.getCoverage());
+                    ceilingRiskList.add(driverRisk.getCeilling());
+
+                }
+            });
+
+            assisCHKBX.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    AssistanceRisk assistanceRisk = new AssistanceRisk();
+
+                    for (int i = 0; i< assistanceRisk.AssistanceRiskCoverd.length; i++) {
+                        coveredRisksList.add(assistanceRisk.AssistanceRiskCoverd[i]);
+                    }
+                    premiumRisksList.add(assistanceRisk.getPrimuim());
+                    coverageRisksList.add(assistanceRisk.getCoverage());
+                    ceilingRiskList.add(assistanceRisk.getCeilling());
+                }
+            });
+
+
     }
 
     public static void main(String[] args) {
