@@ -345,19 +345,43 @@ JTextField subPhone = new JTextField();
         showBTN.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // add next session
+                String str = "";
+                for (int i =0; i< coveredRisksList.size();i++){
+                    str += coveredRisksList.get(i) + "\n";
+                }
+                riskText.setText(str);
+
+
+                try{
+                    polictText.setText(GetPolicyData().toString());
+                    DisplayPaymentsOfPolicy();
+                } catch (ParseException parseException) {
+                    parseException.printStackTrace();
+                }
             }
         });
         saveBTN.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // add next
+                try {
+                    SaveCustomerMapToDisk();
+
+
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                } catch (ParseException ex) {
+                    throw new RuntimeException(ex);
+                } catch (ClassNotFoundException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         });
         loadBTN.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // add next
+                SearchCustomerByMobileNB();
             }
         });
         newBTN.addActionListener(new ActionListener() {
@@ -510,12 +534,118 @@ JTextField subPhone = new JTextField();
         searchClaimer.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                cond1 = false;          // Customer is registered before in on our db??
+                cond2 = false;          // Is the customer's policy cover the claimed risk?
+                cond3 = false;          // Is the policy date is valid?
+
+                try{
+                    coveredRisksByUserLIST.clear();
+                    Customer c = ClaimsSearchCustomerByMobileNb();
+                    claimingCustomerNameLBL.setText("Claiming Customer: "+ c.getFname() + " " +c.getLname());
+                    cond1 = true;
+
+
+                    String str7 = "";
+                    for (int i=0 ; i<c.getPolicy().getRisksCoverdList().size();i++){
+                        str7 += c.getPolicy().getRisksCoverdList().get(i) + " \n";
+                        coveredRisksByUserLIST.add(c.getPolicy().getRisksCoverdList().get(i));
+                    }
+
+                    LocalDate v_validityofPolicy = c.getPolicy().getPolicyDate();
+                    int v_policyVaslidityYears = c.getPolicy().getValidityYear();
+                    v_validityofPolicy = v_validityofPolicy.plusYears(v_policyVaslidityYears);
+
+                    CheckPolicyValidity(v_validityofPolicy);
+
+                    claimingCustomerRisksCoveredAREA.setText("Covered Risks by Customer plan:\n"+str7);
+                    claimingCustomerValidDateLBL.setText("Date Validity of Policy: " +v_validityofPolicy+"  || " +CheckPolicyValidity(v_validityofPolicy));
+
+                    if (c.getPolicy().getRisksCoverdList().size() >=5){
+                        // if the user has a all-risks plan
+                        cond2 = true;
+                    }
+
+                }catch (Exception re){
+                    claimingCustomerNameLBL.setText("Claiming Customer: Not Found");
+                }
 
             }
         });
         confirmClaimBTN.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // Get the index of all the selected items
+                int[] selectedIx = claimList.getSelectedIndices();
+                List<String> claimed_list = new ArrayList<>();
+
+
+                if (claimList.getSelectedIndex() != -1) {
+                    for (int i= 0; i< selectedIx.length; i++) {
+                        String k = "" + claimList.getModel().getElementAt(selectedIx[i]) + " ";
+                        claimed_list.add(""+claimList.getModel().getElementAt(selectedIx[i]));
+                        System.out.print("" + k);
+                    }
+                }
+
+                // Check for the included risks??
+                if (cond2 == false){
+                    cond2 = claimed_list.containsAll(coveredRisksByUserLIST);
+                }
+
+
+                // Check for claim validity to add the claim to the customer,
+                // claims map on other file myfile2
+                ClaimIsValid();
+
+                // Display settlements
+                Customer c = ClaimsSearchCustomerByMobileNb();
+                if (ClaimIsValid()){
+                    int claims_nb = claimed_list.size();
+                    if (claimed_list.contains("Fire")){
+                        settlementArea2.setText("Fire Department: " +
+                                c.getPolicy().getVehicle().getEstimatedValue()*0.25 + " $");
+
+                    }else if (claimed_list.contains("Robbery")){
+                        settlementArea2.setText("ProSec Company: " +
+                                c.getPolicy().getVehicle().getEstimatedValue()*0.5 + " $" +
+                                "Pay for Customer: " +
+                                c.getPolicy().getVehicle().getEstimatedValue()*1 + " $");
+
+                    }else if  (claimed_list.contains("Third Party Damage")){
+                        settlementArea2.setText("Driver in other Car: " + 2000 + "$");
+
+                    }else if (claimed_list.contains("Vehicle Damage")){
+                        settlementArea2.setText("Pay for Customer: " +
+                                c.getPolicy().getVehicle().getEstimatedValue()*1+ " $");
+
+                    }else if (claimed_list.contains("Driver Damage")) {
+                        settlementArea2.setText("Pay for Customer: " +
+                                c.getPolicy().getVehicle().getEstimatedValue()*10+ " $");
+
+                    }else if (claimed_list.contains("Transport")){
+                        settlementArea2.setText("Transport Company " +
+                                c.getPolicy().getVehicle().getEstimatedValue()*0.5+ " $");
+
+                    }else if (claimed_list.contains("Car Replacement")){
+                        settlementArea2.setText("Car Rental Company " +
+                                c.getPolicy().getVehicle().getEstimatedValue()*0.2+ " $");
+
+                    }else if (claims_nb > 2){
+                        settlementArea2.setText("Driver "
+                                + c.getPolicy().getVehicle().getEstimatedValue()*4+ " $"+
+                                "Hospital " + c.getPolicy().getVehicle().getEstimatedValue()*4
+                                + " $ "+
+
+                                "Car Rental Company "
+                                + c.getPolicy().getVehicle().getEstimatedValue()*0.2 + " $ "+
+                                "Third Party Driver " +
+                                c.getPolicy().getVehicle().getEstimatedValue()*2
+                        );
+
+                    }else{
+
+                    }
+                }
 
             }
         });
@@ -876,6 +1006,43 @@ JTextField subPhone = new JTextField();
         }
 
         return customer;
+    }
+
+
+    private boolean CheckPolicyValidity(LocalDate v_validityofPolicy){
+        LocalDate now = LocalDate.now();
+
+        if (now.isBefore(v_validityofPolicy)){
+            cond3 = true;
+            return true;
+        }else{
+            cond3 = false;
+            return false;
+        }
+    }
+
+    private boolean ClaimIsValid(){
+        if (cond1 == true && cond2 == true && cond3 == true){
+            claimStatusLBL2.setText("Claiming Status: You can register the Claim");
+            return true;
+        }else{
+            claimStatusLBL2.setText("Claiming Status: Not Able to register the Claim");
+            return false;
+        }
+    }
+
+    private void DisplayPaymentsOfPolicy(){
+        for (int i = 0; i< premiumRisksList.size(); i++){
+            totalPremium += premiumRisksList.get(i);
+            totalCoverage += coverageRisksList.get(i);
+            totalCeiling += ceilingRiskList.get(i);
+        }
+
+        settlementArea.setText(
+                "Total Premium: "+totalPremium*Integer.parseInt(estimated.getText()) + " $ \n "+
+                        "Risks Coverage: " + totalCoverage*Integer.parseInt(estimated.getText())*10 + " $ \n"+
+                        "Max Ceiling: "+totalCeiling*Integer.parseInt(estimated.getText()) + 100000 + " $ \n"
+        );
     }
 
 
