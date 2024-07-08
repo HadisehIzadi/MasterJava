@@ -3,8 +3,10 @@ import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
 import Plan.*;
@@ -53,6 +55,8 @@ JTextField subPhone = new JTextField();
     int validityYEAR = 0;
     SimpleDateFormat df;
     Date currentDate;
+    //*************** panel 5 **********
+    JTextField searchTXT;
     //***************panel 6 *************
     JTextArea riskText;
     //**************** panel 7 **********
@@ -335,7 +339,7 @@ JTextField subPhone = new JTextField();
         JButton loadBTN = new JButton("Load Customer");
         JButton newBTN = new JButton("New Customer");
 
-        JTextField searchTXT = new JTextField("Enter Car Plate Nb");
+         searchTXT = new JTextField("Enter Car Plate Nb");
         searchTXT.setOpaque(false);
 
         showBTN.addActionListener(new ActionListener() {
@@ -360,6 +364,7 @@ JTextField subPhone = new JTextField();
             @Override
             public void actionPerformed(ActionEvent e) {
                 // add next
+                NewCustomer();
             }
         });
 
@@ -624,19 +629,28 @@ JTextField subPhone = new JTextField();
         return  customer;
     }
 
-    private Policy GetPolicyData() {
-        return null;
+    private Policy GetPolicyData() throws ParseException {
+        currentDate = new Date();
+        LocalDate now = LocalDate.now();
+
+        return new Policy(
+                GetVehicleData(),
+                coveredRisksList,
+                premiumRisksList,
+                coverageRisksList,
+                ceilingRiskList,
+                validityYEAR,
+                now );
     }
 
     // Vehicle Data
     public Vehicle GetVehicleData() throws  ParseException{
-        Vehicle vehicle = new Vehicle(
+        return new Vehicle(
                 Integer.parseInt(plateNb.getText()),
                 Integer.parseInt(modelYear.getText()),
                 manufacurer.getText(),
                 Integer.parseInt(estimated.getText()),
                 GetDamageState());
-        return vehicle;
     }
     public int GetDamageState(){
 
@@ -725,6 +739,148 @@ JTextField subPhone = new JTextField();
 
 
     }
+
+    private void NewCustomer(){
+        coverageRisksList.clear();
+        coveredRisksList.clear();
+        premiumRisksList.clear();
+        ceilingRiskList.clear();
+        cond1= false;
+        cond2= false;
+        cond3= false;
+
+        subFname.setText("");
+        subLname.setText("");
+        subCity.setText("");
+        subPhone.setText("");
+        plateNb.setText("");
+        modelYear.setText("");
+        manufacurer.setText("");
+        estimated.setText("");
+
+        G1.clearSelection();
+        G2.clearSelection();
+
+        obligatoryCHKBX.setSelected(false);
+        allRiskCHKBX.setSelected(false);
+        vDamageCHKBX.setSelected(false);
+        dDamageCHKBX.setSelected(false);
+        assisCHKBX.setSelected(false);
+
+        dDamageCHKBX.setEnabled(true);
+        vDamageCHKBX.setEnabled(true);
+        assisCHKBX.setEnabled(true);
+        obligatoryCHKBX.setEnabled(true);
+
+
+    }
+
+    public void SaveCustomerMapToDisk() throws IOException, ClassNotFoundException, ParseException {
+        File file = new File("D:/myfile.dat");
+        int platenbmr = Integer.parseInt(plateNb.getText());
+
+        if (!file.exists()) {
+            // Creating a new file
+            System.out.println("Not Existed");
+            file.createNewFile();
+
+            SaveCustomerMaptoNewFile(platenbmr, file);
+        } else {
+            // file exists
+            TreeMap<Integer, Customer> newMaptoSave = new TreeMap<>();
+            InputStream is = new FileInputStream(file);
+            ObjectInputStream ois = new ObjectInputStream(is);
+
+            TreeMap<Integer, Customer> mapInFile = (TreeMap<Integer, Customer>) ois.readObject();
+            ois.close();
+            is.close();
+
+            // Get old map
+            for (Map.Entry<Integer, Customer> m : mapInFile.entrySet()) {
+                newMaptoSave.put(m.getKey(), m.getValue());
+            }
+
+            // Updating the map: Adding new Customer to map
+            newMaptoSave.put(platenbmr, GetCustomerData());
+
+            // Saving the updates to file
+            OutputStream os = new FileOutputStream(file);
+            ObjectOutputStream oos = new ObjectOutputStream(os);
+            oos.writeObject(newMaptoSave);
+            oos.flush();
+            oos.close();
+
+        }
+
+    }
+
+    private void SaveCustomerMaptoNewFile(int platenbmr, File file) throws ParseException, IOException {
+
+        TreeMap<Integer, Customer> newMaptoSave = new TreeMap<>();
+
+        // Adding new CUstomer to map
+        newMaptoSave.put(platenbmr,GetCustomerData());
+
+        OutputStream os = new FileOutputStream(file);
+        ObjectOutputStream oos = new ObjectOutputStream(os);
+        oos.writeObject(newMaptoSave);
+        oos.flush();
+        oos.close();
+    }
+
+    private void SearchCustomerByMobileNB(){
+        File file = new File("D:/myfile.dat");
+
+        try{
+            InputStream is = new FileInputStream(file);
+            ObjectInputStream ois = new ObjectInputStream(is);
+
+            TreeMap<Integer,Customer> mapInFile = (TreeMap<Integer,Customer>)ois.readObject();
+
+
+
+            Customer c_finded = mapInFile.get(Integer.parseInt(searchTXT.getText()));
+            customerTxt.setText(c_finded.toString());
+            ois.close();
+            is.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private Customer ClaimsSearchCustomerByMobileNb(){
+        Customer customer = new Customer();
+        File file = new File("D:/myfile.dat");
+
+        try{
+            InputStream is = new FileInputStream(file);
+            ObjectInputStream ois = new ObjectInputStream(is);
+
+            TreeMap<Integer, Customer> mapInFile =  (TreeMap<Integer,Customer>)ois.readObject();
+
+            ois.close();
+            is.close();
+
+            customer = mapInFile.get(Integer.parseInt(claimingCustomerField.getText()));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return customer;
+    }
+
+
+
+
 
     public static void main(String[] args) {
 
