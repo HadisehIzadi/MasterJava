@@ -587,7 +587,6 @@ JTextField subPhone = new JTextField();
                     }
                 }
 
-                // Check for the included risks??
                 if (cond2 == false){
                     cond2 = claimed_list.containsAll(coveredRisksByUserLIST);
                 }
@@ -596,7 +595,7 @@ JTextField subPhone = new JTextField();
 
                 ClaimIsValid();
 
-                // Display settlements
+
                 Customer c = ClaimsSearchCustomerByMobileNb();
                 if (ClaimIsValid()){
                     int claims_nb = claimed_list.size();
@@ -676,7 +675,6 @@ JTextField subPhone = new JTextField();
         p10.setLayout(new GridLayout(4, 1));
 
 
-        // Jlabels
         claimingCustomerNameLBL = new JLabel("Claiming Customer: ");
         claimingCustomerValidDateLBL = new JLabel("Date Validity of Policy: ");
         claimStatusLBL2 = new JLabel("Claiming Status: ");
