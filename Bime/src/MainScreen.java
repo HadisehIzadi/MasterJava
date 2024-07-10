@@ -593,7 +593,7 @@ JTextField subPhone = new JTextField();
                 }
 
 
-                
+
                 ClaimIsValid();
 
                 // Display settlements
