@@ -673,6 +673,9 @@ JTextField subPhone = new JTextField();
         p10.setBorder(titledBorder);
         p10.setBounds(680, 360, 300, 230);
         p10.setLayout(new GridLayout(4, 1));
+        //************************
+        // this code updated today
+        //***********************
 
 
         claimingCustomerNameLBL = new JLabel("Claiming Customer: ");
