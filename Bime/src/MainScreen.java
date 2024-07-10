@@ -593,8 +593,7 @@ JTextField subPhone = new JTextField();
                 }
 
 
-                // Check for claim validity to add the claim to the customer,
-                // claims map on other file myfile2
+                
                 ClaimIsValid();
 
                 // Display settlements
